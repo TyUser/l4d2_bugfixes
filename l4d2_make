@@ -1,4 +1,6 @@
 ##
+#	debian 8
+#
 #	mkdir -p alliedmodders
 #	cd alliedmodders
 #	git clone --depth=1 --branch=1.9-dev https://github.com/alliedmodders/sourcemod sourcemod
@@ -86,9 +88,9 @@ HX_FLAGS += -Wall \
 	-Werror
 
 #
-HX_LIB = l4d2_release/smsdk_ext.o \
-	l4d2_release/detours.o \
-	l4d2_release/extension.o \
+HX_LIB = smsdk_ext.o \
+	detours.o \
+	extension.o \
 	asm/asm.c \
 	$(HX_SDK)/lib/linux/tier1_i486.a \
 	$(HX_SDK)/lib/linux/mathlib_i486.a \
@@ -97,14 +99,20 @@ HX_LIB = l4d2_release/smsdk_ext.o \
 
 #
 all:
-	mkdir -p l4d2_release
 	ln -sf $(HX_SOURCEMOD)/public/smsdk_ext.cpp
 	ln -sf $(HX_SDK)/lib/linux/libvstdlib_srv.so
 	ln -sf $(HX_SDK)/lib/linux/libtier0_srv.so
 
-	gcc $(HX_INCLUDE) $(HX_FLAGS) -o l4d2_release/smsdk_ext.o -c smsdk_ext.cpp
-	gcc $(HX_INCLUDE) $(HX_FLAGS) -o l4d2_release/detours.o -c CDetour/detours.cpp
-	gcc $(HX_INCLUDE) $(HX_FLAGS) -o l4d2_release/extension.o -c extension.cpp
-	gcc $(HX_INCLUDE) $(HX_LIB) -m32 -shared -static-libgcc -ldl -lm -o l4d2_release/l4d2_bugfixes.ext.so
-	rm -rf l4d2_release/*.o
-	zip -r l4d2_bugfixes.zip ./l4d2_release/
+	gcc $(HX_INCLUDE) $(HX_FLAGS) -o smsdk_ext.o -c smsdk_ext.cpp
+	gcc $(HX_INCLUDE) $(HX_FLAGS) -o detours.o -c CDetour/detours.cpp
+	gcc $(HX_INCLUDE) $(HX_FLAGS) -o extension.o -c extension.cpp
+	gcc $(HX_INCLUDE) $(HX_LIB) -m32 -shared -static-libgcc -ldl -lm -o l4d2_bugfixes.ext.so
+
+	tar -czvf l4d2_bugfixes.tar.gz l4d2_bugfixes.ext.so
+
+	unlink libvstdlib_srv.so
+	unlink libtier0_srv.so
+	unlink smsdk_ext.cpp
+
+	rm -f l4d2_bugfixes.ext.so
+	rm -rf *.o
